@@ -1,14 +1,14 @@
 use super::packet::Packet;
 
-fn bulk_read(t_addr: u8) -> Packet {
+pub fn bulk_read(t_addr: u8) -> Packet {
     Packet::new(t_addr, 0x00, Vec::new())
 }
 
-fn set_digital_output(t_addr: u8, pin: u8, value: bool) -> Packet {
+pub fn set_digital_output(t_addr: u8, pin: u8, value: bool) -> Packet {
     Packet::new(t_addr, 0x01, vec![pin, value as u8])
 }
 
-fn set_digital_output_all(t_addr: u8, values: u8) -> Packet {
+pub fn set_digital_output_all(t_addr: u8, values: u8) -> Packet {
     Packet::new(t_addr, 0x02, vec![values])
 }
 
@@ -19,19 +19,19 @@ pub enum DigitalMode {
     Output = 0x01,
 }
 
-fn set_digital_mode(t_addr: u8, pin: u8, mode: DigitalMode) -> Packet {
+pub fn set_digital_mode(t_addr: u8, pin: u8, mode: DigitalMode) -> Packet {
     Packet::new(t_addr, 0x03, vec![pin, mode as u8])
 }
 
-fn get_digital_mode(t_addr: u8, pin: u8) -> Packet {
+pub fn get_digital_mode(t_addr: u8, pin: u8) -> Packet {
     Packet::new(t_addr, 0x04, vec![pin])
 }
 
-fn get_digital_input(t_addr: u8, pin: u8) -> Packet {
+pub fn get_digital_input(t_addr: u8, pin: u8) -> Packet {
     Packet::new(t_addr, 0x05, vec![pin])
 }
 
-fn get_digital_input_all(t_addr: u8) -> Packet {
+pub fn get_digital_input_all(t_addr: u8) -> Packet {
     Packet::new(t_addr, 0x06, Vec::new())
 }
 
@@ -57,7 +57,7 @@ pub enum ADCChannel {
 }
 
 impl ADCChannel {
-    fn analog(port: u8) -> ADCChannel {
+    pub fn analog(port: u8) -> ADCChannel {
         match port {
             0 => ADCChannel::Analog0,
             1 => ADCChannel::Analog1,
@@ -67,7 +67,7 @@ impl ADCChannel {
         }
     }
 
-    fn motor(port: u8) -> ADCChannel {
+    pub fn motor(port: u8) -> ADCChannel {
         match port {
             0 => ADCChannel::Motor0,
             1 => ADCChannel::Motor1,
@@ -85,7 +85,7 @@ pub enum DataConfig {
     Raw = 0x01,
 }
 
-fn get_current(t_addr: u8, channel: ADCChannel, config: DataConfig) -> Packet {
+pub fn get_current(t_addr: u8, channel: ADCChannel, config: DataConfig) -> Packet {
     Packet::new(t_addr, 0x07, vec![channel as u8, config as u8])
 }
 
@@ -104,60 +104,60 @@ pub enum MotorZPB {
     Float = 1,
 }
 
-fn set_motor_config(t_addr: u8, port: u8, mode: MotorMode, zpb: MotorZPB) -> Packet {
+pub fn set_motor_config(t_addr: u8, port: u8, mode: MotorMode, zpb: MotorZPB) -> Packet {
     Packet::new(t_addr, 0x08, vec![port, mode as u8, zpb as u8])
 }
 
-fn get_motor_config(t_addr: u8, port: u8) -> Packet {
+pub fn get_motor_config(t_addr: u8, port: u8) -> Packet {
     Packet::new(t_addr, 0x09, vec![port])
 }
 
-fn set_motor_activation(t_addr: u8, port: u8, active: bool) -> Packet {
+pub fn set_motor_activation(t_addr: u8, port: u8, active: bool) -> Packet {
     Packet::new(t_addr, 0x0a, vec![port, active as u8])
 }
 
-fn get_motor_activation(t_addr: u8, port: u8) -> Packet {
+pub fn get_motor_activation(t_addr: u8, port: u8) -> Packet {
     Packet::new(t_addr, 0x0b, vec![port])
 }
 
-fn set_motor_current_alert(t_addr: u8, port: u8, current: i16) -> Packet {
+pub fn set_motor_current_alert(t_addr: u8, port: u8, current: i16) -> Packet {
     let mut data: Vec<u8> = Vec::with_capacity(3);
     data.push(port);
     data.extend_from_slice(&current.to_le_bytes());
     Packet::new(t_addr, 0x0c, data)
 }
 
-fn get_motor_current_alert(t_addr: u8, port: u8) -> Packet {
+pub fn get_motor_current_alert(t_addr: u8, port: u8) -> Packet {
     Packet::new(t_addr, 0x0d, vec![port])
 }
 
-fn reset_motor_encoder(t_addr: u8, port: u8) -> Packet {
+pub fn reset_motor_encoder(t_addr: u8, port: u8) -> Packet {
     Packet::new(t_addr, 0x0e, vec![port])
 }
 
-fn set_motor_power(t_addr: u8, port: u8, power: i16) -> Packet {
+pub fn set_motor_power(t_addr: u8, port: u8, power: i16) -> Packet {
     let mut data: Vec<u8> = Vec::with_capacity(3);
     data.push(port);
     data.extend_from_slice(&power.to_le_bytes());
     Packet::new(t_addr, 0x0f, data)
 }
 
-fn get_motor_power(t_addr: u8, port: u8) -> Packet {
+pub fn get_motor_power(t_addr: u8, port: u8) -> Packet {
     Packet::new(t_addr, 0x10, vec![port])
 }
 
-fn set_motor_target_vel(t_addr: u8, port: u8, vel: i16) -> Packet {
+pub fn set_motor_target_vel(t_addr: u8, port: u8, vel: i16) -> Packet {
     let mut data: Vec<u8> = Vec::with_capacity(3);
     data.push(port);
     data.extend_from_slice(&vel.to_le_bytes());
     Packet::new(t_addr, 0x11, data)
 }
 
-fn get_motor_target_vel(t_addr: u8, port: u8) -> Packet {
+pub fn get_motor_target_vel(t_addr: u8, port: u8) -> Packet {
     Packet::new(t_addr, 0x12, vec![port])
 }
 
-fn set_motor_target_pos(t_addr: u8, port: u8, pos: i32, tolerance: i16) -> Packet {
+pub fn set_motor_target_pos(t_addr: u8, port: u8, pos: i32, tolerance: i16) -> Packet {
     let mut data: Vec<u8> = Vec::with_capacity(7);
     data.push(port);
     data.extend_from_slice(&pos.to_le_bytes());
@@ -165,15 +165,15 @@ fn set_motor_target_pos(t_addr: u8, port: u8, pos: i32, tolerance: i16) -> Packe
     Packet::new(t_addr, 0x13, data)
 }
 
-fn get_motor_target_pos(t_addr: u8, port: u8) -> Packet {
+pub fn get_motor_target_pos(t_addr: u8, port: u8) -> Packet {
     Packet::new(t_addr, 0x14, vec![port])
 }
 
-fn get_motor_target_status(t_addr: u8, port: u8) -> Packet {
+pub fn get_motor_target_status(t_addr: u8, port: u8) -> Packet {
     Packet::new(t_addr, 0x15, vec![port])
 }
 
-fn get_motor_position(t_addr: u8, port: u8) -> Packet {
+pub fn get_motor_position(t_addr: u8, port: u8) -> Packet {
     Packet::new(t_addr, 0x16, vec![port])
 }
 
@@ -184,7 +184,7 @@ pub struct MotorPIDCoeffs {
 }
 
 impl MotorPIDCoeffs {
-    fn export(&self) -> Vec<u8> {
+    pub fn export(&self) -> Vec<u8> {
         [
             self.p.to_le_bytes().as_slice(),
             self.i.to_le_bytes().as_slice(),
@@ -194,7 +194,7 @@ impl MotorPIDCoeffs {
     }
 }
 
-fn set_motor_pid_coeffs(t_addr: u8, port: u8, mode: MotorMode, coeffs: MotorPIDCoeffs) -> Packet {
+pub fn set_motor_pid_coeffs(t_addr: u8, port: u8, mode: MotorMode, coeffs: MotorPIDCoeffs) -> Packet {
     let mut data: Vec<u8> = Vec::with_capacity(14);
     data.push(port);
     data.push(mode as u8);
@@ -202,67 +202,67 @@ fn set_motor_pid_coeffs(t_addr: u8, port: u8, mode: MotorMode, coeffs: MotorPIDC
     Packet::new(t_addr, 0x17, data)
 }
 
-fn get_motor_pid_coeffs(t_addr: u8, port: u8, mode: MotorMode) -> Packet {
+pub fn get_motor_pid_coeffs(t_addr: u8, port: u8, mode: MotorMode) -> Packet {
     Packet::new(t_addr, 0x18, vec![port, mode as u8])
 }
 
-fn set_pwm_config(t_addr: u8, channel: u8, period: i16) -> Packet {
+pub fn set_pwm_config(t_addr: u8, channel: u8, period: i16) -> Packet {
     let mut data: Vec<u8> = Vec::with_capacity(3);
     data.push(channel);
     data.extend_from_slice(&period.to_le_bytes());
     Packet::new(t_addr, 0x19, data)
 }
 
-fn get_pwm_config(t_addr: u8, channel: u8) -> Packet {
+pub fn get_pwm_config(t_addr: u8, channel: u8) -> Packet {
     Packet::new(t_addr, 0x1a, vec![channel])
 }
 
-fn set_pulse_width(t_addr: u8, channel: u8, width_us: i16) -> Packet {
+pub fn set_pulse_width(t_addr: u8, channel: u8, width_us: i16) -> Packet {
     let mut data: Vec<u8> = Vec::with_capacity(3);
     data.push(channel);
     data.extend_from_slice(&width_us.to_le_bytes());
     Packet::new(t_addr, 0x1b, data)
 }
 
-fn get_pulse_width(t_addr: u8, channel: u8) -> Packet {
+pub fn get_pulse_width(t_addr: u8, channel: u8) -> Packet {
     Packet::new(t_addr, 0x1c, vec![channel])
 }
 
-fn set_pwm_activation(t_addr: u8, channel: u8, active: bool) -> Packet {
+pub fn set_pwm_activation(t_addr: u8, channel: u8, active: bool) -> Packet {
     Packet::new(t_addr, 0x1d, vec![channel, active as u8])
 }
 
-fn get_pwm_activation(t_addr: u8, channel: u8) -> Packet {
+pub fn get_pwm_activation(t_addr: u8, channel: u8) -> Packet {
     Packet::new(t_addr, 0x1e, vec![channel])
 }
 
-fn set_servo_pwm_config(t_addr: u8, port: u8, period: i16) -> Packet {
+pub fn set_servo_pwm_config(t_addr: u8, port: u8, period: i16) -> Packet {
     let mut data: Vec<u8> = Vec::with_capacity(3);
     data.push(port);
     data.extend_from_slice(&period.to_le_bytes());
     Packet::new(t_addr, 0x1f, data)
 }
 
-fn get_servo_pwm_config(t_addr: u8, port: u8) -> Packet {
+pub fn get_servo_pwm_config(t_addr: u8, port: u8) -> Packet {
     Packet::new(t_addr, 0x20, vec![port])
 }
 
-fn set_servo_pw(t_addr: u8, port: u8, width_us: i16) -> Packet {
+pub fn set_servo_pw(t_addr: u8, port: u8, width_us: i16) -> Packet {
     let mut data: Vec<u8> = Vec::with_capacity(3);
     data.push(port);
     data.extend_from_slice(&width_us.to_le_bytes());
     Packet::new(t_addr, 0x21, data)
 }
 
-fn get_servo_pw(t_addr: u8, port: u8) -> Packet {
+pub fn get_servo_pw(t_addr: u8, port: u8) -> Packet {
     Packet::new(t_addr, 0x22, vec![port])
 }
 
-fn set_servo_activation(t_addr: u8, port: u8, active: bool) -> Packet {
+pub fn set_servo_activation(t_addr: u8, port: u8, active: bool) -> Packet {
     Packet::new(t_addr, 0x23, vec![port, active as u8])
 }
 
-fn get_servo_activation(t_addr: u8, port: u8) -> Packet {
+pub fn get_servo_activation(t_addr: u8, port: u8) -> Packet {
     Packet::new(t_addr, 0x24, vec![port])
 }
 
@@ -271,28 +271,28 @@ pub struct I2cAddress {
 }
 
 impl I2cAddress {
-    fn new(addr: u8) -> Self {
+    pub fn new(addr: u8) -> Self {
         Self {
             seven_bit: (addr & 0x7F),
         }
     }
 
-    fn from_8b(addr: u8) -> Self {
+    pub fn from_8b(addr: u8) -> Self {
         Self {
             seven_bit: (addr >> 1),
         }
     }
 
-    fn to_8b(&self) -> u8 {
+    pub fn to_8b(&self) -> u8 {
         self.seven_bit << 1
     }
 }
 
-fn i2c_write_single(t_addr: u8, bus: u8, addr: I2cAddress, value: u8) -> Packet {
+pub fn i2c_write_single(t_addr: u8, bus: u8, addr: I2cAddress, value: u8) -> Packet {
     Packet::new(t_addr, 0x25, vec![bus, addr.seven_bit, value])
 }
 
-fn i2c_write_many(t_addr: u8, bus: u8, addr: I2cAddress, values: Vec<u8>) -> Packet {
+pub fn i2c_write_many(t_addr: u8, bus: u8, addr: I2cAddress, values: Vec<u8>) -> Packet {
     let mut data: Vec<u8> = Vec::with_capacity(3 + values.len());
     data.push(bus);
     data.push(addr.seven_bit);
@@ -301,19 +301,19 @@ fn i2c_write_many(t_addr: u8, bus: u8, addr: I2cAddress, values: Vec<u8>) -> Pac
     Packet::new(t_addr, 0x26, data)
 }
 
-fn i2c_read_single(t_addr: u8, bus: u8, addr: I2cAddress) -> Packet {
+pub fn i2c_read_single(t_addr: u8, bus: u8, addr: I2cAddress) -> Packet {
     Packet::new(t_addr, 0x27, vec![bus, addr.seven_bit])
 }
 
-fn i2c_read_many(t_addr: u8, bus: u8, addr: I2cAddress, bytes_to_read: u8) -> Packet {
+pub fn i2c_read_many(t_addr: u8, bus: u8, addr: I2cAddress, bytes_to_read: u8) -> Packet {
     Packet::new(t_addr, 0x28, vec![bus, addr.seven_bit, bytes_to_read])
 }
 
-fn i2c_read_followup(t_addr: u8, bus: u8) -> Packet {
+pub fn i2c_read_followup(t_addr: u8, bus: u8) -> Packet {
     Packet::new(t_addr, 0x29, vec![bus])
 }
 
-fn i2c_write_followup(t_addr: u8, bus: u8) -> Packet {
+pub fn i2c_write_followup(t_addr: u8, bus: u8) -> Packet {
     Packet::new(t_addr, 0x2a, vec![bus])
 }
 
@@ -327,35 +327,35 @@ pub enum I2cSpeed {
     Unknown = 0xff,
 }
 
-fn i2c_configure_channel(t_addr: u8, bus: u8, speed: I2cSpeed) -> Packet {
+pub fn i2c_configure_channel(t_addr: u8, bus: u8, speed: I2cSpeed) -> Packet {
     Packet::new(t_addr, 0x2b, vec![bus, speed as u8])
 }
 
-fn phone_charge_control(t_addr: u8, enabled: bool) -> Packet {
+pub fn phone_charge_control(t_addr: u8, enabled: bool) -> Packet {
     Packet::new(t_addr, 0x2c, vec![enabled as u8])
 }
 
-fn get_phone_charge(t_addr: u8) -> Packet {
+pub fn get_phone_charge(t_addr: u8) -> Packet {
     Packet::new(t_addr, 0x2d, Vec::new())
 }
 
-fn inject_datalog_hint() -> Packet {
+pub fn inject_datalog_hint() -> Packet {
     todo!("Ya, im not figuring out this string stuff")
 }
 
-fn i2c_get_channel_config(t_addr: u8, bus: u8) -> Packet {
+pub fn i2c_get_channel_config(t_addr: u8, bus: u8) -> Packet {
     Packet::new(t_addr, 0x2f, vec![bus])
 }
 
-fn read_version(t_addr: u8) -> Packet {
+pub fn read_version(t_addr: u8) -> Packet {
     Packet::new(t_addr, 0x30, Vec::new())
 }
 
-fn ftdi_reset_control(t_addr: u8, enabled: bool) -> Packet {
+pub fn ftdi_reset_control(t_addr: u8, enabled: bool) -> Packet {
     Packet::new(t_addr, 0x31, vec![enabled as u8])
 }
 
-fn get_ftdi_reset(t_addr: u8) -> Packet {
+pub fn get_ftdi_reset(t_addr: u8) -> Packet {
     Packet::new(t_addr, 0x32, Vec::new())
 }
 
@@ -368,7 +368,7 @@ pub enum MotorControlAlgorithm {
     NotSet = 0xff,
 }
 
-fn set_motor_pidf_coeffs(
+pub fn set_motor_pidf_coeffs(
     t_addr: u8,
     port: u8,
     mode: MotorMode,
@@ -385,7 +385,7 @@ fn set_motor_pidf_coeffs(
     Packet::new(t_addr, 0x33, data)
 }
 
-fn i2c_write_read_many(
+pub fn i2c_write_read_many(
     t_addr: u8,
     bus: u8,
     addr: I2cAddress,
@@ -399,6 +399,6 @@ fn i2c_write_read_many(
     )
 }
 
-fn get_motor_pidf_coeffs(t_addr: u8, port: u8, mode: MotorMode) -> Packet {
+pub fn get_motor_pidf_coeffs(t_addr: u8, port: u8, mode: MotorMode) -> Packet {
     Packet::new(t_addr, 0x35, vec![port, mode as u8])
 }
