@@ -2,6 +2,7 @@ use std::sync::atomic::{AtomicU8, Ordering};
 
 static PKT_ID_ASSIGNEE: AtomicU8 = AtomicU8::new(0);
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Packet {
     header: [u8; 2],  // D, K
     pkt_length: u16,  // 11+ bytes
@@ -9,23 +10,19 @@ pub struct Packet {
     src_addr: u8,     // 0x00 usually
     pkt_id: u8,       // Wrapping tracking num from 0->255
     ref_id: u8,       // Reference num for replies, all outbound have 0 by default
-    msg_type: u16,    // Type of message/command
+    pkt_type: u16,    // Type of message/command
     payload: Vec<u8>, // Actual message data
 //  checksum: u8,     // CRC Checksum
 }
 
 impl Packet {
-
-    pub fn new(target_addr: u8, src_addr: u8, msg_type: u16, payload: Vec<u8>) -> Self {
+    pub fn new(target_addr: u8, pkt_type: u16, payload: Vec<u8>) -> Self {
         Packet {
-            header: [0x44, 0x4b],
             pkt_length: (11 + payload.len()) as u16,
             target_addr,
-            src_addr,
-            pkt_id: 0x00,
-            ref_id: 0x00,
-            msg_type,
+            pkt_type,
             payload,
+            ..Packet::default()
         }
     }
 
@@ -51,7 +48,7 @@ impl Packet {
         bytes.push(self.src_addr);
         bytes.push(self.pkt_id);
         bytes.push(self.ref_id);
-        for &b in &self.msg_type.to_le_bytes() {
+        for &b in &self.pkt_type.to_le_bytes() {
             sum = sum.wrapping_add(b);
             bytes.push(b);
         }
@@ -61,5 +58,20 @@ impl Packet {
         }
         bytes.push(sum);
         bytes
+    }
+}
+
+impl Default for Packet {
+    fn default() -> Self {
+        Self {
+            header: [0x44, 0x4b],
+            pkt_length: 0x0b,
+            target_addr: 0x01,
+            src_addr: 0x00,
+            pkt_id: 0x00,
+            ref_id: 0x00,
+            pkt_type: 0x00,
+            payload: Vec::new()
+        }
     }
 }
