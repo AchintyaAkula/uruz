@@ -40,10 +40,11 @@ impl Packet {
             sum = sum.wrapping_add(b);
             bytes.push(b);
         }
-        sum = sum.wrapping_add(self.target_addr)
-                 .wrapping_add(self.src_addr)
-                 .wrapping_add(self.pkt_id)
-                 .wrapping_add(self.ref_id);
+        sum = sum
+            .wrapping_add(self.target_addr)
+            .wrapping_add(self.src_addr)
+            .wrapping_add(self.pkt_id)
+            .wrapping_add(self.ref_id);
         bytes.push(self.target_addr);
         bytes.push(self.src_addr);
         bytes.push(self.pkt_id);
@@ -71,7 +72,7 @@ impl Default for Packet {
             pkt_id: 0x00,
             ref_id: 0x00,
             pkt_type: 0x00,
-            payload: Vec::new()
+            payload: Vec::new(),
         }
     }
 }
