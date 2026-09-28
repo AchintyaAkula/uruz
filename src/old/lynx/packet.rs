@@ -1,7 +1,13 @@
+use crate::lynx::commands::Command;
+use crate::lynx::error::PacketError;
 use std::sync::atomic::{AtomicU8, Ordering};
 
 static PKT_ID_ASSIGNEE: AtomicU8 = AtomicU8::new(0);
 
+/// Packet Struct
+/// Represents standard lynx datagram sent by the Android/Java layer
+///
+/// Checksum is not a field because it is automatically applied when exporting
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Packet {
     header: [u8; 2],  // D, K
@@ -16,16 +22,41 @@ pub struct Packet {
 }
 
 impl Packet {
-    pub fn new(target_addr: u8, pkt_type: u16, payload: Vec<u8>) -> Self {
+    pub fn new(target_addr: u8, pkt_type: impl Command, payload: Vec<u8>) -> Self {
         Packet {
             pkt_length: (11 + payload.len()) as u16,
             target_addr,
-            pkt_type,
+            pkt_type: pkt_type.into(),
             payload,
             ..Packet::default()
         }
     }
 
+    /// Imports into `Packet` struct using a `Vec<u8>`
+    ///
+    /// Verifies Checksum and Header and handles errors
+    pub fn import(data: Vec<u8>) -> Result<Self, PacketError> {
+        if !(data[0] == 0x44 && data[1] == 0x4B) {
+            Err(PacketError::InvalidHeader)
+        } else if !Self::verify_checksum(data.clone()) {
+            Err(PacketError::InvalidChecksum)
+        } else {
+            Ok(Packet {
+                pkt_length: u16::from_le_bytes(data[2..=3].try_into().unwrap()),
+                target_addr: data[4],
+                src_addr: data[5],
+                pkt_id: data[6],
+                ref_id: data[7],
+                pkt_type: u16::from_le_bytes(data[8..=9].try_into().unwrap()),
+                payload: data[10..data.len() - 1].into(),
+                ..Self::default()
+            })
+        }
+    }
+
+    /// Exports `Packet` struct into `Vec<u8`
+    ///
+    /// Calculates checksum, and assigns unique packet ID
     pub fn export(&mut self) -> Vec<u8> {
         self.pkt_id = PKT_ID_ASSIGNEE.fetch_add(1, Ordering::Relaxed);
 
@@ -59,6 +90,14 @@ impl Packet {
         }
         bytes.push(sum);
         bytes
+    }
+
+    fn verify_checksum(data: Vec<u8>) -> bool {
+        let mut checksum: u8 = 0u8;
+        for b in 0..data.len() {
+            checksum = checksum.wrapping_add(data[b]);
+        }
+        checksum == *data.last().unwrap()
     }
 }
 
